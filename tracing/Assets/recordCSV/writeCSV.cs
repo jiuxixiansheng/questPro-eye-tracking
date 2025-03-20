@@ -11,6 +11,7 @@ public class writeCSV : MonoBehaviour
     public VideoPlayer _Vplayer;
     public Laser leftRay;
     public Laser2 rightRay;
+    public GameObject hitcollider;//检测碰撞的碰撞体
 
     private string filePath;
     private string customPath;
@@ -25,8 +26,11 @@ public class writeCSV : MonoBehaviour
     public InputField inputField; // 输入框组件
     public Text displayText;      // 用于显示用户输入的文本
     private int inputNum = 0;//输入的帧数
+
+    private drawTrail trail;//热图轨迹
     void Start()
     {
+        trail = GameObject.Find("HitManager").GetComponent<drawTrail>();//赋值轨迹
         // 设置文件路径 (在项目的 Persistent Data Path 中保存)
         customPath = "D:\\unity project\\tracing\\Assets\\CSV";
         filePath = Path.Combine(customPath, "data.csv");
@@ -42,6 +46,7 @@ public class writeCSV : MonoBehaviour
     {
         if (_Vplayer != null && _Vplayer.isPlaying)
         {
+            hitcollider.GetComponent<MeshCollider>().enabled =true;//启用目标碰撞
             double deltaTime = currentTime == 0 ? _Vplayer.time : _Vplayer.time - currentTime;
             if (deltaTime >= 1 / _Vplayer.frameRate)
             {
@@ -54,6 +59,7 @@ public class writeCSV : MonoBehaviour
             }
             
         }
+        else hitcollider.GetComponent<MeshCollider>().enabled = false;//禁用目标碰撞
     }
 
     // 写入 CSV 的方法
@@ -79,7 +85,7 @@ public class writeCSV : MonoBehaviour
         if (!isStart)
         {
             Debug.Log("1");
-            _Vplayer.frame = inputNum;
+            //_Vplayer.frame = inputNum;
             _Vplayer.Play();
             isStart = true;
         }
@@ -94,6 +100,15 @@ public class writeCSV : MonoBehaviour
     {
         data.Clear();
         data.Add(new string[] { "Frame", "Left eye direction", "Right eye direction" });
+        trail.clearMap();
+    }
+
+    public void restart()
+    {
+        _Vplayer.frame = 0;
+        _Vplayer.Play();
+        clearData();//清除数据
+        isStart = true;
     }
 
     //输入后执行

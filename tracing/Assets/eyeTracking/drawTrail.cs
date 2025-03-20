@@ -105,4 +105,9 @@ public class drawTrail : MonoBehaviour
         currentTex = new RenderTexture(tex.width, tex.height, 0, RenderTextureFormat.ARGB32);
 
     }
+
+    public void clearMap()
+    {
+        Graphics.Blit(tex, cacheTex);
+    }
 }
